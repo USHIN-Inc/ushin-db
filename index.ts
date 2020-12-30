@@ -6,11 +6,22 @@ const AUTHOR_KEY = "author";
 const REGEX_NON_WORDS = /\W+/;
 const DEFAULT_SORT = [{ type: "desc" }, { createdAt: "desc" }];
 
+import type { LevelDown } from "leveldown";
+import {
+  AuthorInfo,
+  AuthorInfoOnlyIdAndRevRequired,
+  UshinBaseConstructorOptions,
+} from "./types";
+
 // Based on USHIN data model
 // https://github.com/USHIN-Inc/ushin-ui-components/blob/master/src/dataModels/dataModels.ts
 
 class USHINBase {
-  constructor({ leveldown, authorURL }) {
+  leveldown: LevelDown;
+  //TODO: fix typing of db
+  db: any;
+  authorURL: string;
+  constructor({ leveldown, authorURL }: UshinBaseConstructorOptions) {
     this.leveldown = leveldown;
     this.db = new PouchDB("ushin-db", {
       adapter: "leveldb",
@@ -32,31 +43,32 @@ class USHINBase {
     await this.createIndex("type", "createdAt", "allPoints");
   }
 
-  async createIndex(...fields) {
+  async createIndex(...fields: string[]) {
     return this.db.createIndex({
       index: { fields },
     });
   }
 
-  async setAuthorInfo(info = {}) {
-    const { _rev, _id, ...data } = await this.getAuthorInfo();
+  async setAuthorInfo(
+    authorInfo: AuthorInfo = {} as AuthorInfo
+  ): Promise<void> {
+    const { _rev, ...data } = await this.getAuthorInfo();
     await this.db.put({
       ...data,
-      ...info,
+      ...authorInfo,
       _id: AUTHOR_KEY,
       _rev,
     });
   }
 
-  async getAuthorInfo() {
+  async getAuthorInfo(): Promise<AuthorInfoOnlyIdAndRevRequired> {
     try {
       const info = await this.db.get(AUTHOR_KEY);
       return info;
     } catch (e) {
       if (e.name === "not_found") {
         await this.db.put({ _id: AUTHOR_KEY });
-        // No need to await when returning from async fn
-        return this.db.get(AUTHOR_KEY);
+        return await this.db.get(AUTHOR_KEY);
       } else {
         throw e;
       }
