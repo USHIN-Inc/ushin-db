@@ -1,5 +1,4 @@
 const PouchDB = orDefault(require("pouchdb"));
-PouchDB.plugin(orDefault(require("pouchdb-adapter-leveldb-browser")));
 PouchDB.plugin(orDefault(require("pouchdb-find")));
 
 const AUTHOR_KEY = "author";
@@ -9,19 +8,44 @@ const DEFAULT_SORT = [{ type: "desc" }, { createdAt: "desc" }];
 // Based on USHIN data model
 // https://github.com/USHIN-Inc/ushin-ui-components/blob/master/src/dataModels/dataModels.ts
 
+let initialized = null;
+
 class USHINBase {
-  constructor({ leveldown, authorURL }) {
-    this.leveldown = leveldown;
-    this.db = new PouchDB("ushin-db", {
-      adapter: "leveldb",
-      db: leveldown,
-      // This is some weird legacy thing we're going to pretend doesn't exist.
-      migrate: false,
+  static init(opts) {
+    if (initialized) return initialized;
+    initialized = orDefault(require("pouchdb-adapter-hyperbee"))(opts)
+    PouchDB.plugin(initialized);
+    return initialized;
+  }
+
+  static async close () {
+    if(initialized) initialized.close()
+  }
+
+  constructor({ url, ...opts }) {
+    USHINBase.init(opts);
+    this.db = new PouchDB(url, {
+      adapter: "hyperbee",
     });
-    this.authorURL = authorURL;
+  }
+
+  get writable() {
+    return this.db.bee.feed.writable;
+  }
+
+  get peers() {
+    return this.db.bee.feed.peers || [];
   }
 
   async init() {
+    // Wait for the DB to load
+    await new Promise((resolve, reject) => {
+      this.db.once("open", resolve);
+      this.db.once("error", reject);
+    });
+
+    this.authorURL = await this.db.getURL();
+
     // TODO create indexes here based on the sorts of queries we want
     await this.createIndex("type");
 
