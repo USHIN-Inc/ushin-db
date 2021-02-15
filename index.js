@@ -88,7 +88,15 @@ class USHINBase {
   }
 
   async addMessage(
-    { _id, _rev, revisionOf, main, createdAt = new Date(), shapes = {} },
+    {
+      _id,
+      _rev,
+      revisionOf,
+      main,
+      responseHistory,
+      createdAt = new Date(),
+      shapes = {},
+    },
     pointStore = {}
   ) {
     if (!main) throw new Error("Message lacks main point");
@@ -131,6 +139,7 @@ class USHINBase {
       type: "message",
       revisionOf,
       main,
+      responseHistory,
       createdAt: createdAtTime,
       author: authorURL,
       shapes,
@@ -195,8 +204,21 @@ class USHINBase {
     );
   }
 
-  async getPointsForMessage({ main, shapes }, existingPoints = {}) {
-    const pointIds = [main, ...Object.values(shapes).flat()];
+  async getPointsForMessage(
+    { main, shapes, responseHistory },
+    existingPoints = {}
+  ) {
+    let pointIds = [main, ...Object.values(shapes).flat()];
+
+    const allResponsePointIds = new Set();
+    for (const response of responseHistory) {
+      allResponsePointIds.add(response.mainPointId);
+      if (response.secondaryPointId !== undefined) {
+        allResponsePointIds.add(response.secondaryPointId);
+      }
+    }
+
+    pointIds = pointIds.concat(Array.from(allResponsePointIds));
 
     const dedupedPointIds = pointIds.filter((id) => !existingPoints[id]);
 
