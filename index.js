@@ -1,5 +1,6 @@
 const PouchDB = orDefault(require("pouchdb"));
 PouchDB.plugin(orDefault(require("pouchdb-find")));
+const HyperbeePlugin = orDefault(require("pouchdb-adapter-hyperbee"))
 
 const AUTHOR_KEY = "author";
 const REGEX_NON_WORDS = /\W+/;
@@ -13,7 +14,7 @@ let initialized = null;
 class USHINBase {
   static init(opts) {
     if (initialized) return initialized;
-    initialized = orDefault(require("pouchdb-adapter-hyperbee"))(opts)
+    initialized = HyperbeePlugin(opts)
     PouchDB.plugin(initialized);
     return initialized;
   }

@@ -1,7 +1,8 @@
+import type {SDKOptions} from 'hyper-sdk'
+
 declare module "ushin-db" {
-  export interface UshinBaseConstructorOptions {
-    leveldown: any;
-    authorURL: string;
+  export interface UshinBaseConstructorOptions extends SDKOptions {
+    url: string
   }
 
   export type AuthorInfo = {
@@ -34,7 +35,7 @@ declare module "ushin-db" {
     sort?: number;
   }
 
-  export declare class USHINBase {
+  export class USHINBase {
     constructor(options: UshinBaseConstructorOptions);
     init(): Promise<undefined>;
     createIndex(...fields: string[]): Promise<undefined>;
