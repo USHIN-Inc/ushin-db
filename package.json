@@ -27,7 +27,7 @@
   "dependencies": {
     "hyper-sdk": "^3.0.6",
     "pouchdb": "^7.2.2",
-    "pouchdb-adapter-hyperbee": "^1.0.2",
+    "pouchdb-adapter-hyperbee": "^1.0.3",
     "pouchdb-find": "^7.2.2"
   },
   "devDependencies": {
