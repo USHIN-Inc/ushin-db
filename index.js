@@ -1,6 +1,6 @@
 const PouchDB = orDefault(require("pouchdb"));
 PouchDB.plugin(orDefault(require("pouchdb-find")));
-const HyperbeePlugin = orDefault(require("pouchdb-adapter-hyperbee"))
+const HyperbeePlugin = orDefault(require("pouchdb-adapter-hyperbee"));
 
 const AUTHOR_KEY = "author";
 const REGEX_NON_WORDS = /\W+/;
@@ -14,13 +14,13 @@ let initialized = null;
 class USHINBase {
   static init(opts) {
     if (initialized) return initialized;
-    initialized = HyperbeePlugin(opts)
+    initialized = HyperbeePlugin(opts);
     PouchDB.plugin(initialized);
     return initialized;
   }
 
-  static async close () {
-    if(initialized) initialized.close()
+  static async close() {
+    if (initialized) initialized.close();
   }
 
   constructor({ url, ...opts }) {
@@ -206,7 +206,7 @@ class USHINBase {
   }
 
   async getPointsForMessage(
-    { main, shapes, responseHistory },
+    { main, shapes, responseHistory = [] },
     existingPoints = {}
   ) {
     let pointIds = [main, ...Object.values(shapes).flat()];

@@ -31,13 +31,13 @@ const EXAMPLE_POINT_STORE = {
 };
 
 test.onFinish(() => {
-  USHINBase.close()
-})
+  USHINBase.close();
+});
 
 test("Able to initialize and set author metadata", async (t) => {
   t.plan(3);
   try {
-    var db = await getNew('hyper://t1');
+    var db = await getNew("hyper://t1");
 
     t.pass("Able to create the DB");
 
@@ -58,7 +58,7 @@ test("Able to initialize and set author metadata", async (t) => {
 test("Able to add and get messages", async (t) => {
   t.plan(8);
   try {
-    var db = await getNew('hyper://t2');
+    var db = await getNew("hyper://t2");
 
     const id = await db.addMessage(EXAMPLE_MESSAGE, EXAMPLE_POINT_STORE);
 
@@ -97,7 +97,7 @@ test("Able to add and get messages", async (t) => {
 test.skip("Able to search for messages in a time range", async (t) => {
   t.plan(6);
   try {
-    var db = await getNew('hyper://t3');
+    var db = await getNew("hyper://t3");
 
     await db.addPoint(EXAMPLE_POINT);
 
@@ -146,7 +146,7 @@ test.skip("Able to search for messages in a time range", async (t) => {
 test("Able to search for messages that contain a point ID", async (t) => {
   t.plan(1);
   try {
-    var db = await getNew('hyper://t4');
+    var db = await getNew("hyper://t4");
 
     await db.addMessage(
       { ...EXAMPLE_MESSAGE, focus: EXAMPLE_POINT_ID },
@@ -164,9 +164,9 @@ test("Able to search for messages that contain a point ID", async (t) => {
 });
 
 test("Able to search for points by their text contents", async (t) => {
-  t.plan(2)
+  t.plan(2);
   try {
-    var db = await getNew('hyper://t5');
+    var db = await getNew("hyper://t5");
 
     await db.addPoint({ content: "Hello world", _id: "one" });
     await db.addPoint({ content: "Goodbye world", _id: "two" });
